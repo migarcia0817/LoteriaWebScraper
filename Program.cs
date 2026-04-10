@@ -21,7 +21,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// ❌ Quitar redirección HTTPS porque Render ya maneja HTTPS externamente
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
