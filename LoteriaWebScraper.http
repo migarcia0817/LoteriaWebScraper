@@ -1,0 +1,6 @@
+@LoteriaWebScraper_HostAddress = http://localhost:5078
+
+GET {{LoteriaWebScraper_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
