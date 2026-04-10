@@ -1,12 +1,4 @@
-# Visual Studio
-.vs/
-*.vsidx
-*.suo
-*.user
-
-# Compilación
 bin/
 obj/
-
-# Otros temporales
-*.log
+*.user
+*.http
