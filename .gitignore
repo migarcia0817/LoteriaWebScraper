@@ -2,3 +2,7 @@ bin/
 obj/
 *.user
 *.http
+*.log
+*.db
+*.DS_Store
+/Properties/launchSettings.json
