@@ -11,7 +11,7 @@ namespace LoteriaWebScraper
         private readonly ILogger<ScraperService> _logger;
         private readonly FirebaseClient _firebaseClient;
 
-        // Diccionario de mapeo entre nombre y clave (claves limpias para Firebase)
+        // Diccionario de mapeo entre nombre y clave (igual que lo tenías)
         private static readonly Dictionary<string, string> LoteriaClaves = new Dictionary<string, string>
         {
             { "Anguilla 08:00 AM", "Anguilla_800_AM" },
@@ -29,27 +29,27 @@ namespace LoteriaWebScraper
             { "Anguilla 8:00 PM", "Anguilla_800_PM" },
             { "Anguilla 9:00 PM", "Anguilla_900_PM" },
             { "Anguilla 10:00 PM", "Anguilla_1000_PM"},
-            { "NY.Tarde 3:30 PM", "NYTarde_330PM"},
-            { "NY.Noche 11:30 PM", "NYNoche_1130PM"},
-            { "King Lotery 12:30 PM", "KingLot_1230PM"},
-            { "King Lotery 7:30 PM", "KingLot_730PM"},
-            { "Suerte 12:30 PM", "Suerte_1230PM"},
-            { "Suerte 6:00 PM", "Suerte_600PM"},
-            { "Primera 12:00 PM", "Primera_1200PM"},
-            { "Primera 7:00 PM", "Primera_700PM"},
-            { "Q.Real Tarde 12:55 PM", "QRealTarde_1255PM" },
-            { "FL.Tarde 1:30 PM", "FLTarde_130PM"},
-            { "FL.Noche 9:45 PM", "FLNoche_945PM" },
-            { "Loteka 7:55 PM", "Loteka_755PM"},
-            { "Gana Mas 2:30 PM", "GanaMas_230PM"},
-            { "Nacional", "NacNoche_900PM"},
-            { "Leidsa", "Leidsa_850PM"},
-            { "Haiti Bolet 9:30 AM", "HaitiBolet_930AM" },
-            { "Haiti Bolet 10:30 AM", "HaitiBolet_1030AM" },
-            { "Haiti Bolet 11:30 AM", "HaitiBolet_1130AM" },
-            { "Haiti Bolet 5:30 PM", "HaitiBolet_530PM" },
-            { "Haiti Bolet 6:30 PM", "HaitiBolet_630PM" },
-            { "Haiti Bolet 7:30 PM", "HaitiBolet_730PM" }
+            { "NYTarde 3:30 PM", "NYTarde_330_PM"},
+            { "NYNoche 11:30 PM", "NYNoche 11:30 PM"},
+            { "King Lotery 12:30 PM", "KingLot_1230_PM"},
+            { "King Lotery 7:30 PM", "KingLot_730_PM"},
+            { "Suerte 12:30 PM", "Suerte_1230_PM"},
+            { "Suerte 6:00 PM", "Suerte_600_PM"},
+            { "Primera 12:00 PM", "Primera_1200_PM"},
+            { "Primera 7:00 PM", "Primera_700_PM"},
+            { "Q.Real Tarde 12:55 PM", "QRealTarde_100_PM" },
+            { "FL.Tarde 1:30 PM", "FLTarde_130_PM"},
+            { "FL.Noche 9:45 PM", "FLNoche_1025_PM" },
+            { "Loteka 7:55 PM", "Loteka_755_PM"},
+            { "Gana Mas 2:30 PM", "Gana_Mas_230_PM"},
+            { "Nacional", "NacNoche_900_PM"},
+            { "Leidsa", "Leidsa_850_PM"},
+            { "Haiti Bolet 9:30 AM", "Haiti_Bolet_930_AM" },
+            { "Haiti Bolet 10:30 AM", "Haiti_Bolet_1030_AM" },
+            { "Haiti Bolet 11:30 AM", "Haiti_Bolet_1130_AM" },
+            { "Haiti Bolet 5:30 PM", "Haiti_Bolet_530_PM" },
+            { "Haiti Bolet 6:30 PM", "Haiti_Bolet_630_PM" },
+            { "Haiti Bolet 7:30 PM", "Haiti_Bolet_730_PM" }
         };
 
         public ScraperService(ILogger<ScraperService> logger)
@@ -138,23 +138,197 @@ namespace LoteriaWebScraper
         private string? NormalizarNombre(string nombre, string hora)
         {
             if (string.IsNullOrWhiteSpace(nombre))
-                return null;
+                return null; // ⚠️ devolver null explícito si no hay nombre
+
+            // Centralizar la normalización en HoraHelper
+            //   string horaNormalizada = HoraHelper.Normalizar(hora);
 
             string horaNormalizada;
             if (DateTime.TryParse(hora, out var dt))
-                horaNormalizada = dt.ToString("h:mm tt", CultureInfo.InvariantCulture);
-            else
-                horaNormalizada = hora.Trim();
+                horaNormalizada = dt.ToString("h:mm tt"); // ejemplo: "8:00 AM"
+            else horaNormalizada = hora.Trim();
+            // Anguilla
+            //  if (nombre.StartsWith("Anguilla"))
+            //   {
+            //        if (HoraHelper.AnguillaHoras.TryGetValue(horaNormalizada, out var horaFinal))
+            //            return $"Anguilla {horaFinal}"; // ✅ usar el valor del diccionario
+            //        else
+            //            return null; // ⚠️ Hora inválida, se omite
+            //    }
+            if (nombre.StartsWith("Anguilla"))
+            {
+                if (horaNormalizada == "8:00 AM")
+                    return "Anguilla 08:00 AM";
+                if (horaNormalizada == "9:00 AM")
+                    return "Anguilla 09:00 AM";
+                if (horaNormalizada == "10:00 AM")
+                    return "Anguilla 10:00 AM";
+                if (horaNormalizada == "11:00 AM")
+                    return "Anguilla 11:00 AM";
+                if (horaNormalizada == "12:00 PM")
+                    return "Anguilla 12:00 PM";
+                if (horaNormalizada == "1:00 PM")
+                    return "Anguilla 1:00 PM";
+                if (horaNormalizada == "2:00 PM")
+                    return "Anguilla 2:00 PM";
+                if (horaNormalizada == "3:00 PM")
+                    return "Anguilla 3:00 PM";
+                if (horaNormalizada == "4:00 PM")
+                    return "Anguilla 4:00 PM";
+                if (horaNormalizada == "5:00 PM")
+                    return "Anguilla 5:00 PM";
+                if (horaNormalizada == "6:00 PM")
+                    return "Anguilla 6:00 PM";
+                if (horaNormalizada == "7:00 PM")
+                    return "Anguilla 7:00 PM";
+                if (horaNormalizada == "8:00 PM")
+                    return "Anguilla 8:00 PM";
+                if (horaNormalizada == "9:00 PM")
+                    return "Anguilla 9:00 PM";
+                if (horaNormalizada == "10:00 PM")
+                    return "Anguilla 10:00 PM";
 
-            // … aquí mantienes tu lógica de normalización (Anguilla, Primera, Suerte, etc.)
-            // asegurándote de devolver exactamente las claves que definiste arriba en LoteriaClaves
-            // Ejemplo:
+
+            }
+
+
+            // La Primera
+            if (nombre.StartsWith("La Primera"))
+            {
+                if (horaNormalizada == "12:00 PM")
+                    return "Primera 12:00 PM";
+                else if (horaNormalizada == "7:00 PM")
+                    return "Primera 7:00 PM";
+                else if (horaNormalizada == "8:00 PM")
+                    return "Primera 8 PM";
+            }
+
+            // La Suerte
+            if (nombre.StartsWith("La Suerte"))
+            {
+                if (horaNormalizada.Contains("12:30 PM") || horaNormalizada.Contains("12 PM"))
+                    return "Suerte 12:30 PM";
+
+                if (horaNormalizada.Contains("6:00 PM") || horaNormalizada.Contains("6PM"))
+                    return "Suerte 6:00 PM";
+
+                _logger.LogWarning($"⚠️ No se encontró clave para La Suerte ({horaNormalizada}), se omite.");
+                return null;
+            }
+
+            // King Lottery Día/Noche
+            if (nombre.StartsWith("King Lottery"))
+            {
+                if (nombre.Contains("Día") || horaNormalizada.Contains("12:30 PM"))
+                    return "King Lotery 12:30 PM";
+                if (nombre.Contains("Noche") || horaNormalizada.Contains("7:30 PM"))
+                    return "King Lotery 7:30 PM";
+            }
+
+            // Real → Q.Real
+            if (nombre.StartsWith("Real"))
+            {
+                if (horaNormalizada.Contains("1:00 PM")) return "Q.Real Tarde 1:00 PM";
+                if (horaNormalizada.Contains("12:55 PM")) return "Q.Real Tarde 12:55 PM";
+
+                _logger.LogWarning($"⚠️ No se encontró clave para Real ({horaNormalizada}), se omite.");
+                return null;
+            }
+
+            // Florida
+            if (nombre.StartsWith("Florida"))
+            {
+                if (horaNormalizada.Contains("2:30 PM"))
+                    return "FL.Tarde 2:30 PM";
+                if (horaNormalizada.Contains("1:30 PM"))
+                    return "FL.Tarde 1:30 PM";
+                else if (horaNormalizada.Contains("10:25 PM") || horaNormalizada.Contains("9:45 PM"))
+                    return "FL.Noche 9:45 PM";  // 👈 siempre normaliza a 10:25 PM
+            }
+
+
+            // New York
             if (nombre.StartsWith("New York"))
                 return horaNormalizada.Contains("2:30 PM") ? "NY.Tarde 3:30 PM" : "NY.Noche 11:30 PM";
 
-            // resto de tu lógica…
+            // Loteka
+            if (nombre.StartsWith("Loteka"))
+                return "Loteka 7:55 PM";
+
+            // Leidsa / Leisa
+            //  if (nombre.StartsWith("Leidsa") || nombre.StartsWith("Leisa"))
+            //    return "Leisa 8:55 PM";
+            // Leidsa / Leisa
+            if (nombre.StartsWith("Leidsa") || nombre.StartsWith("Leisa"))
+            {
+                var hoy = DateTime.Today.DayOfWeek;
+
+                if (hoy == DayOfWeek.Sunday)
+                {
+                    // ✅ Los domingos se devuelve LeisaDomingo
+                    return "Leidsa";
+                }
+                else
+                {
+                    // ✅ De lunes a sábado se mantiene la lógica normal
+                    return "Leidsa";
+                    //  return horaNormalizada.Contains("8:50 PM")
+                    // "Leisa";
+                }
+            }
+
+
+            // Nacional
+            // if (nombre.StartsWith("Nacional"))
+            //   return horaNormalizada.Contains("2:55 PM") ? "Nac.Tarde 2:55 PM" : "Nac.Noche 9:00 PM";
+            // Nacional
+            if (nombre.StartsWith("Nacional"))
+            {
+                var hoy = DateTime.Today.DayOfWeek;
+
+                if (hoy == DayOfWeek.Sunday)
+                {
+                    // ✅ Los domingos se devuelve NacDomingo
+                    return "Nacional";
+
+                }
+                else
+                {
+                    // ✅ De lunes a sábado se mantiene la lógica normal
+                    return horaNormalizada.Contains("2:30 PM")
+                        ? "Gana Mas 2:30 PM"
+                        : "Nacional";
+                }
+            }
+            if (nombre.StartsWith("Haiti Bolet"))
+            {
+                if (horaNormalizada.Contains("9:30"))
+                    return "Haiti Bolet 9:30 AM";
+                if (horaNormalizada.Contains("10:30"))
+                    return "Haiti Bolet 10:30 AM";
+                if (horaNormalizada.Contains("11:30"))
+                    return "Haiti Bolet 11:30 AM";
+                if (horaNormalizada.Contains("5:30"))
+                    return "Haiti Bolet 5:30 PM";
+                if (horaNormalizada.Contains("6:30"))
+                    return "Haiti Bolet 6:30 PM";
+                if (horaNormalizada.Contains("7:30"))
+                    return "Haiti Bolet 7:30 PM";
+
+                _logger.LogWarning($"⚠️ No se encontró clave para Haiti Bolet ({horaNormalizada}), se omite.");
+                return null;
+            }
+
+
+
+            // Gana Más → Nac.Tarde
+            if (nombre.StartsWith("Gana Más"))
+                return "Gana Mas 2:30 PM";
+
+            // 🔹 Si no se reconoce, loguear y devolver null
             _logger.LogWarning($"⚠️ Nombre de lotería no reconocido: {nombre} ({horaNormalizada}), se omite.");
             return null;
         }
+
     }
 }
