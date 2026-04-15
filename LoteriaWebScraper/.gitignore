@@ -1,0 +1,21 @@
+## Build results
+bin/
+obj/
+out/
+
+## Visual Studio cache
+.vs/
+
+## User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Logs
+*.log
+
+## Others
+*.tmp
+*.temp
