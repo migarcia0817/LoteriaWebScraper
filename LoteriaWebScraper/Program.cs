@@ -28,4 +28,9 @@ app.UseAuthorization();
 // ✅ mapea tus controladores (ScraperController)
 app.MapControllers();
 
+// 🔹 Ajuste para Render: escuchar en el puerto asignado
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://*:{port}");
+
+// ✅ arranca la aplicación
 app.Run();
