@@ -55,13 +55,19 @@ namespace LoteriaWebScraper
         public ScraperService(ILogger<ScraperService> logger)
         {
             _logger = logger;
-            _firebaseClient = new FirebaseClient("https://bancachupon-default-rtdb.firebaseio.com/");
+
+            _firebaseClient = new FirebaseClient(
+                "https://bancachupon-default-rtdb.firebaseio.com/",
+                new FirebaseOptions
+                {
+                    AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
+                });
         }
 
         // Aquí van tus métodos ObtenerNumerosGanadoresAsync, GuardarResultadosEnFirebase y NormalizarNombre
-    
 
-         public async Task<List<(string Loteria, string Fecha, string Hora, string Numero)>> ObtenerNumerosGanadoresAsync()
+
+        public async Task<List<(string Loteria, string Fecha, string Hora, string Numero)>> ObtenerNumerosGanadoresAsync()
         {
             var url = "https://enloteria.com";
             using var client = new HttpClient();
