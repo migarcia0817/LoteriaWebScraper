@@ -28,6 +28,9 @@ app.UseAuthorization();
 // ✅ mapea tus controladores (ScraperController)
 app.MapControllers();
 
+// 🔹 Endpoint de bienvenida en la raíz
+app.MapGet("/", () => "LoteriaWebScraper API está en línea ✅ Usa /api/scraper/run para ejecutar el scraper.");
+
 // 🔹 Ajuste para Render: escuchar en el puerto asignado
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://*:{port}");
