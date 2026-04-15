@@ -317,7 +317,7 @@ namespace LoteriaWebScraper
 
             // 🔹 Si no se reconoce, loguear y devolver null
             _logger.LogWarning($"⚠️ Nombre de lotería no reconocido: {nombre} ({horaNormalizada}), se omite.");
-            return null;
+          //  return null;
             return nombre; // simplificado
         }
     }
