@@ -106,9 +106,13 @@ namespace LoteriaWebScraper
             foreach (var grupo in resultados.GroupBy(r => r.Loteria))
             {
                 var loteriaNombre = grupo.Key;
-                var fechaNormalizada = DateTime.Now.ToString("yyyy-MM-dd");
-                var hora = grupo.First().Hora;
 
+                // ✅ Usar la fecha del sorteo en lugar de DateTime.Now
+                var fechaNormalizada = DateTime.TryParse(grupo.First().Fecha, out var fechaParseada)
+                    ? fechaParseada.ToString("yyyy-MM-dd")
+                    : DateTime.Now.ToString("yyyy-MM-dd");
+
+                var hora = grupo.First().Hora;
                 var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
                 if (string.IsNullOrWhiteSpace(nombreNormalizado)) continue;
 
@@ -134,6 +138,7 @@ namespace LoteriaWebScraper
                     });
             }
         }
+
 
         private string? NormalizarNombre(string nombre, string hora)
         {
