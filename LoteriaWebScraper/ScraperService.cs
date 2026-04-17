@@ -2,6 +2,7 @@
 using Firebase.Database.Query;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace LoteriaWebScraper
 {
@@ -103,25 +104,46 @@ namespace LoteriaWebScraper
 
         public async Task GuardarResultadosEnFirebase(List<(string Loteria, string Fecha, string Hora, string Numero)> resultados)
         {
+            
+
+            int guardados = 0;
+            int omitidosClaveNula = 0;
+            int omitidosSinDiccionario = 0;
+
             foreach (var grupo in resultados.GroupBy(r => r.Loteria))
             {
                 var loteriaNombre = grupo.Key;
-
-                // ✅ Usar la fecha del sorteo en lugar de DateTime.Now
-                var fechaNormalizada = DateTime.TryParse(grupo.First().Fecha, out var fechaParseada)
-                    ? fechaParseada.ToString("yyyy-MM-dd")
-                    : DateTime.Now.ToString("yyyy-MM-dd");
-
+                var fechaNormalizada = FechaHelper.GetFechaLocal(); // ✅ usar helper
                 var hora = grupo.First().Hora;
-                var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
-                if (string.IsNullOrWhiteSpace(nombreNormalizado)) continue;
 
-                if (!LoteriaClaves.TryGetValue(nombreNormalizado, out var loteriaClave)) continue;
+                if (loteriaNombre.Contains("LoteDom"))
+                {
+                    _logger.LogInformation($"⏭️ Excluyendo {loteriaNombre}");
+                    continue;
+                }
+
+                var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
+
+                if (string.IsNullOrWhiteSpace(nombreNormalizado))
+                {
+                    omitidosClaveNula++;
+                    _logger.LogWarning($"⚠️ Nombre normalizado nulo para {loteriaNombre} ({hora}), se omite.");
+                    continue;
+                }
+
+                if (!LoteriaClaves.TryGetValue(nombreNormalizado, out var loteriaClave))
+                {
+                    omitidosSinDiccionario++;
+                    _logger.LogWarning($"⚠️ No se encontró clave en el diccionario para {nombreNormalizado}, se omite.");
+                    continue;
+                }
 
                 var numeros = grupo.Select(r => r.Numero).Take(3).ToList();
                 var primerPremio = numeros.ElementAtOrDefault(0) ?? "";
                 var segundoPremio = numeros.ElementAtOrDefault(1) ?? "";
                 var tercerPremio = numeros.ElementAtOrDefault(2) ?? "";
+
+                _logger.LogInformation($"✅ Guardando: {nombreNormalizado} ({fechaNormalizada}) - {primerPremio}, {segundoPremio}, {tercerPremio}");
 
                 await _firebaseClient
                     .Child("Resultados")
@@ -136,8 +158,50 @@ namespace LoteriaWebScraper
                         SegundoPremio = segundoPremio,
                         TercerPremio = tercerPremio
                     });
+
+                guardados++;
             }
+
+            _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, OmitidosClaveNula={omitidosClaveNula}, OmitidosSinDiccionario={omitidosSinDiccionario}");
         }
+
+        //limpiar fecha de mas 
+
+        public async Task LimpiarFechasFuturas()
+        {
+            var fechaHoy = FechaHelper.GetFechaLocal(); // ej: "2026-04-16"
+
+            foreach (var kvp in LoteriaClaves)
+            {
+                var loteriaClave = kvp.Value;
+
+                // Traer todas las fechas guardadas para esa lotería
+                var fechasGuardadas = await _firebaseClient
+                    .Child("Resultados")
+                    .Child(loteriaClave)
+                    .OnceAsync<object>();
+
+                foreach (var registro in fechasGuardadas)
+                {
+                    var fecha = registro.Key;
+
+                    // Si la fecha es distinta a la actual y es mayor → borrar
+                    if (string.Compare(fecha, fechaHoy) > 0)
+                    {
+                        await _firebaseClient
+                            .Child("Resultados")
+                            .Child(loteriaClave)
+                            .Child(fecha)
+                            .DeleteAsync();
+
+                        _logger.LogInformation($"🗑️ Eliminada {loteriaClave} en fecha {fecha}");
+                    }
+                }
+            }
+
+            _logger.LogInformation($"✅ Limpieza completada. Se conservaron solo los resultados del {fechaHoy}");
+        }
+
 
 
         private string? NormalizarNombre(string nombre, string hora)
