@@ -30,7 +30,7 @@ namespace LoteriaWebScraper
             { "Anguilla 9:00 PM", "Anguilla_900_PM" },
             { "Anguilla 10:00 PM", "Anguilla_1000_PM"},
             { "NY.Tarde 3:30 PM", "NYTarde_330_PM"},
-            { "NYNoche 11:30 PM", "NYNoche 11:30 PM"},
+            { "NY.Noche 11:30 PM", "NYNoche 11:30 PM"},
             { "King Lotery 12:30 PM", "KingLot_1230_PM"},
             { "King Lotery 7:30 PM", "KingLot_730_PM"},
             { "Suerte 12:30 PM", "Suerte_1230_PM"},
