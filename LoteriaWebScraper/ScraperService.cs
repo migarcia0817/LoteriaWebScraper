@@ -314,7 +314,18 @@ namespace LoteriaWebScraper
 
             // New York
             if (nombre.StartsWith("New York"))
-                return horaNormalizada.Contains("2:30 PM") ? "NY.Tarde 3:30 PM" : "NY.Noche 11:30 PM";
+            {
+                if (horaNormalizada.Contains("2:30 PM"))
+                    return "NY.Tarde 3:30 PM";
+
+                // Noche puede ser 10:30 PM o 11:30 PM según el horario
+                if (horaNormalizada.Contains("10:30 PM"))
+                    return "NY.Noche 10:30 PM";
+
+                if (horaNormalizada.Contains("11:30 PM"))
+                    return "NY.Noche 11:30 PM";
+            }
+
 
             // Loteka
             if (nombre.StartsWith("Loteka"))
