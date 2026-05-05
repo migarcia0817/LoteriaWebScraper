@@ -30,7 +30,7 @@ namespace LoteriaWebScraper
             { "Anguilla 9:00 PM", "Anguilla_900_PM" },
             { "Anguilla 10:00 PM", "Anguilla_1000_PM"},
             { "NY.Tarde 3:30 PM", "NYTarde_330_PM"},
-            { "NY.Noche 11:30 PM", "NYNoche_1130_PM"},
+            { "NY.Noche 11:30 PM", "NYNoche_1130_PM" },
             { "King Lotery 12:30 PM", "KingLot_1230_PM"},
             { "King Lotery 7:30 PM", "KingLot_730_PM"},
             { "Suerte 12:30 PM", "Suerte_1230_PM"},
@@ -219,6 +219,8 @@ namespace LoteriaWebScraper
             if (DateTime.TryParse(hora, out var dt))
                 horaNormalizada = dt.ToString("h:mm tt"); // ejemplo: "8:00 AM"
             else horaNormalizada = hora.Trim();
+
+
             
             if (nombre.StartsWith("Anguilla"))
             {
@@ -313,18 +315,19 @@ namespace LoteriaWebScraper
 
 
             // New York
-            if (nombre.StartsWith("New York"))
+            // New York
+            if (nombre.ToUpperInvariant().StartsWith("NEW YORK"))
             {
-                if (horaNormalizada.Contains("2:30 PM"))
+                var hora1 = horaNormalizada.Replace(" ", "").ToUpperInvariant();
+
+                if (hora1.Contains("2:30PM"))
                     return "NY.Tarde 3:30 PM";
 
-                // Noche puede ser 10:30 PM o 11:30 PM según el horario
-                if (horaNormalizada.Contains("10:30 PM"))
-                    return "NY.Noche 10:30 PM";
-
-                if (horaNormalizada.Contains("11:30 PM"))
+                if (hora1.Contains("10:30PM") || hora1.Contains("11:30PM"))
                     return "NY.Noche 11:30 PM";
             }
+
+
 
 
             // Loteka
@@ -395,6 +398,8 @@ namespace LoteriaWebScraper
                 return null;
             }
 
+           
+
 
 
             // Gana Más → Nac.Tarde
@@ -405,6 +410,9 @@ namespace LoteriaWebScraper
             _logger.LogWarning($"⚠️ Nombre de lotería no reconocido: {nombre} ({horaNormalizada}), se omite.");
           //  return null;
             return nombre; // simplificado
+
+
+
         }
     }
 }
