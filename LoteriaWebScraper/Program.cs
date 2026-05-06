@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Swagger/OpenAPI (ya viene por defecto)
+// Swagger/OpenAPI (habilitado siempre)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -14,12 +14,9 @@ builder.Services.AddSingleton<ScraperService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// ✅ Swagger siempre activo (no solo en Development)
+app.UseSwagger();
+app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
@@ -34,6 +31,13 @@ app.MapGet("/", () => "LoteriaWebScraper API está en línea ✅ Usa /api/scrape
 // 🔹 Ajuste para Render: escuchar en el puerto asignado
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://*:{port}");
+
+// 🔹 Verificación de FIREBASE_SECRET
+var firebaseSecret = Environment.GetEnvironmentVariable("FIREBASE_SECRET");
+if (string.IsNullOrWhiteSpace(firebaseSecret))
+{
+    Console.WriteLine("⚠️ Advertencia: FIREBASE_SECRET no está configurado. Firebase no podrá actualizar resultados.");
+}
 
 // ✅ arranca la aplicación
 app.Run();
