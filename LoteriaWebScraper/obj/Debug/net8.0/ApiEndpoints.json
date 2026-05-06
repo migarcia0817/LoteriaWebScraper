@@ -1,0 +1,102 @@
+[
+  {
+    "ContainingType": "Program\u002B\u003C\u003Ec",
+    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_0",
+    "RelativePath": "",
+    "HttpMethod": "GET",
+    "IsController": false,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.String",
+        "MediaTypes": [
+          "text/plain"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "LoteriaWebScraper.Controllers.LimpiezaController",
+    "Method": "LimpiarFechasFuturas",
+    "RelativePath": "api/Limpieza/fechas-futuras",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "LoteriaWebScraper.Controllers.ProbandonyController",
+    "Method": "ProbarNormalizacion",
+    "RelativePath": "api/Probandony/probar-normalizacion",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "LoteriaWebScraper.Controllers.ResultadosController",
+    "Method": "PublicarNyNoche",
+    "RelativePath": "api/Resultados/publicar-ny-noche",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "fechaSorteo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "primerPremio",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "segundoPremio",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "tercerPremio",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "LoteriaWebScraper.Controllers.ScraperController",
+    "Method": "Run",
+    "RelativePath": "api/Scraper/run",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "LoteriaWebScraper.Controllers.WeatherForecastController",
+    "Method": "Get",
+    "RelativePath": "WeatherForecast",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[LoteriaWebScraper.WeatherForecast, LoteriaWebScraper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ],
+    "EndpointName": "GetWeatherForecast"
+  }
+]
