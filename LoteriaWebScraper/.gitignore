@@ -1,5 +1,7 @@
 # Ignorar archivos temporales de Visual Studio
+.vs/
+bin/
+obj/
 *.user
 *.suo
 *.cache
-*.env
