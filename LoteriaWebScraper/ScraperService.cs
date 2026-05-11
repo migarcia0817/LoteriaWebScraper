@@ -314,8 +314,8 @@ namespace LoteriaWebScraper
             }
 
 
-            New York
-             New York
+    
+           //  New York
             if (nombre.ToUpperInvariant().StartsWith("NEW YORK"))
             {
                 var hora1 = horaNormalizada.Replace(" ", "").ToUpperInvariant();
