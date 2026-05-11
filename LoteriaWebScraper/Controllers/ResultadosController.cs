@@ -4,6 +4,7 @@ using Firebase.Database.Query;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace LoteriaWebScraper.Controllers
 {
@@ -28,40 +29,40 @@ namespace LoteriaWebScraper.Controllers
         [HttpGet("ny-noche-ayer")]
         public async Task<IActionResult> ObtenerNyNocheAyer()
         {
-            var fechaAyer = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
+            var fechaAyer = DateTime.Today.AddDays(-1).Date;
 
-            var scraper = new ScraperService(null); // inyecta logger si lo tienes
+            var scraper = new ScraperService(null);
             var resultados = await scraper.ObtenerNumerosGanadoresAsync();
 
-            // Filtrar New York Noche del día anterior
             var nyNoche = resultados
                 .Where(r => r.Loteria.ToUpperInvariant().StartsWith("NEW YORK"))
-                .Where(r => DateTime.TryParse(r.Fecha, out DateTime fecha) && fecha.ToString("yyyy-MM-dd") == fechaAyer)
                 .Where(r =>
                 {
-                    if (DateTime.TryParse(r.Hora, out DateTime horaNY))
-                        return (horaNY.Hour == 22 && horaNY.Minute == 30) || (horaNY.Hour == 23 && horaNY.Minute == 30);
+                    if (DateTime.TryParse(r.Fecha, new CultureInfo("es-ES"),
+                                          DateTimeStyles.None, out DateTime fecha))
+                        return fecha.Date == fechaAyer;
                     return false;
+                })
+                .Where(r =>
+                {
+                    var hora1 = r.Hora.Replace(" ", "").ToUpperInvariant();
+                    return hora1.Contains("10:30PM") || hora1.Contains("11:30PM");
                 })
                 .ToList();
 
             if (!nyNoche.Any())
-                return NotFound($"No se encontraron resultados de N.Y Noche para {fechaAyer}");
+                return NotFound($"No se encontraron resultados de N.Y Noche para {fechaAyer:yyyy-MM-dd}");
 
             var numeros = nyNoche.Select(r => r.Numero).Take(3).ToList();
-            var primerPremio = numeros.ElementAtOrDefault(0) ?? "";
-            var segundoPremio = numeros.ElementAtOrDefault(1) ?? "";
-            var tercerPremio = numeros.ElementAtOrDefault(2) ?? "";
 
-            // ✅ Devolver solo los números ganadores
             return Ok(new
             {
-                FechaSorteo = fechaAyer,
+                FechaSorteo = fechaAyer.ToString("yyyy-MM-dd"),
                 LoteriaClave = "NYNoche_1130_PM",
                 LoteriaNombre = "N.Y Noche 11:30 PM",
-                PrimerPremio = primerPremio,
-                SegundoPremio = segundoPremio,
-                TercerPremio = tercerPremio
+                PrimerPremio = numeros.ElementAtOrDefault(0) ?? "",
+                SegundoPremio = numeros.ElementAtOrDefault(1) ?? "",
+                TercerPremio = numeros.ElementAtOrDefault(2) ?? ""
             });
         }
     }
