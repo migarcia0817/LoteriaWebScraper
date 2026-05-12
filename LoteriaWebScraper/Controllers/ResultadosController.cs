@@ -25,45 +25,53 @@ namespace LoteriaWebScraper.Controllers
                 });
         }
 
-        // ✅ Endpoint para mostrar resultados de NY Noche del día anterior
-        [HttpGet("ny-noche-ayer")]
-        public async Task<IActionResult> ObtenerNyNocheAyer()
+        // ✅ Endpoint para mostrar resultados de NY Noche (sin filtrar fecha)
+        [HttpGet("ny-noche")]
+        public async Task<IActionResult> ObtenerNyNoche()
         {
-            var fechaAyer = DateTime.Today.AddDays(-1).Date;
-
             var scraper = new ScraperService(null);
             var resultados = await scraper.ObtenerNumerosGanadoresAsync();
 
             var nyNoche = resultados
-                .Where(r => r.Loteria.ToUpperInvariant().StartsWith("NEW YORK"))
+                .Where(r => r.Loteria.ToUpperInvariant().Contains("NEW YORK"))
                 .Where(r =>
                 {
-                    if (DateTime.TryParse(r.Fecha, new CultureInfo("es-ES"),
-                                          DateTimeStyles.None, out DateTime fecha))
-                        return fecha.Date == fechaAyer;
-                    return false;
-                })
-                .Where(r =>
-                {
-                    var hora1 = r.Hora.Replace(" ", "").ToUpperInvariant();
-                    return hora1.Contains("10:30PM") || hora1.Contains("11:30PM");
+                    // ✅ Normalización de hora
+                    var horaNormalizada = NormalizarNombre(r.Loteria, r.Hora);
+                    return horaNormalizada == "NY.Noche 11:30 PM";
                 })
                 .ToList();
 
             if (!nyNoche.Any())
-                return NotFound($"No se encontraron resultados de N.Y Noche para {fechaAyer:yyyy-MM-dd}");
+                return NotFound("No se encontraron resultados de N.Y Noche");
 
             var numeros = nyNoche.Select(r => r.Numero).Take(3).ToList();
 
             return Ok(new
             {
-                FechaSorteo = fechaAyer.ToString("yyyy-MM-dd"),
                 LoteriaClave = "NYNoche_1130_PM",
                 LoteriaNombre = "N.Y Noche 11:30 PM",
                 PrimerPremio = numeros.ElementAtOrDefault(0) ?? "",
                 SegundoPremio = numeros.ElementAtOrDefault(1) ?? "",
                 TercerPremio = numeros.ElementAtOrDefault(2) ?? ""
             });
+        }
+
+        // 👉 Método de normalización robusto
+        private string NormalizarNombre(string nombre, string horaNormalizada)
+        {
+            if (nombre.ToUpperInvariant().StartsWith("NEW YORK"))
+            {
+                var hora = horaNormalizada.Replace(" ", "").ToUpperInvariant();
+
+                if (hora.Contains("2:30PM"))
+                    return "NY.Tarde 3:30 PM";
+
+                if (hora.Contains("10:30PM") || hora.Contains("11:30PM"))
+                    return "NY.Noche 11:30 PM";
+            }
+
+            return nombre; // fallback si no coincide
         }
     }
 }

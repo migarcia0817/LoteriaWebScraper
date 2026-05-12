@@ -314,8 +314,8 @@ namespace LoteriaWebScraper
             }
 
 
-    
-           //  New York
+
+            //  New York
             if (nombre.ToUpperInvariant().StartsWith("NEW YORK"))
             {
                 var hora1 = horaNormalizada.Replace(" ", "").ToUpperInvariant();
@@ -329,24 +329,14 @@ namespace LoteriaWebScraper
 
             //if (nombre.ToUpperInvariant().StartsWith("NEW YORK"))
             //{
-            //    // Intenta parsear directamente la hora original
-            //    if (DateTime.TryParse(hora, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime horaNY))
-            //    {
-            //        // NY Tarde → 2:30 PM
-            //        if (horaNY.Hour == 14 && horaNY.Minute == 30)
-            //            return "NY.Tarde 3:30 PM";
+            //    var hora1 = horaNormalizada.Replace(" ", "").ToUpperInvariant();
 
-            //        // NY Noche → 10:30 PM o 11:30 PM
-            //        if ((horaNY.Hour == 22 && horaNY.Minute == 30) || (horaNY.Hour == 23 && horaNY.Minute == 30))
-            //            return "NY.Noche 11:30 PM";
-            //    }
-
-            //    // fallback: si no se pudo parsear, usa comparación de texto
-            //    var horaTexto = hora.Replace(" ", "").ToUpperInvariant();
-            //    if (horaTexto.Contains("2:30PM"))
-            //        return "NY.Tarde 3:30 PM";
-            //    if (horaTexto.Contains("10:30PM") || horaTexto.Contains("11:30PM") || horaTexto.Contains("22:30"))
+            //    // 🔥 cualquier variación de noche → MISMA clave
+            //    if (hora1.Contains("1030PM") || hora1.Contains("1130PM"))
             //        return "NY.Noche 11:30 PM";
+
+            //    if (hora1.Contains("230PM") || hora1.Contains("330PM"))
+            //        return "NY.Tarde 3:30 PM";
             //}
 
 
