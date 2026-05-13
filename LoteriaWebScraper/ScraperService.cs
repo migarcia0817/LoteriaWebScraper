@@ -44,6 +44,7 @@ namespace LoteriaWebScraper
             { "Gana Mas 2:30 PM", "Gana_Mas_230_PM"},
             { "Nacional", "NacNoche_900_PM"},
             { "Leidsa", "Leidsa_850_PM"},
+            { "Lotedom 12:00 PM", "Lotedom_1200_PM" },
             { "Haiti Bolet 9:30 AM", "Haiti_Bolet_930_AM" },
             { "Haiti Bolet 10:30 AM", "Haiti_Bolet_1030_AM" },
             { "Haiti Bolet 11:30 AM", "Haiti_Bolet_1130_AM" },
@@ -116,11 +117,7 @@ namespace LoteriaWebScraper
                 var fechaNormalizada = FechaHelper.GetFechaLocal(); // ✅ usar helper
                 var hora = grupo.First().Hora;
 
-                if (loteriaNombre.Contains("LoteDom"))
-                {
-                    _logger.LogInformation($"⏭️ Excluyendo {loteriaNombre}");
-                    continue;
-                }
+               
 
                 var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
 
@@ -327,17 +324,7 @@ namespace LoteriaWebScraper
                     return "NY.Noche 11:30 PM";
             }
 
-            //if (nombre.ToUpperInvariant().StartsWith("NEW YORK"))
-            //{
-            //    var hora1 = horaNormalizada.Replace(" ", "").ToUpperInvariant();
-
-            //    // 🔥 cualquier variación de noche → MISMA clave
-            //    if (hora1.Contains("1030PM") || hora1.Contains("1130PM"))
-            //        return "NY.Noche 11:30 PM";
-
-            //    if (hora1.Contains("230PM") || hora1.Contains("330PM"))
-            //        return "NY.Tarde 3:30 PM";
-            //}
+            
 
 
 
@@ -368,6 +355,11 @@ namespace LoteriaWebScraper
                 }
             }
 
+            if (nombre.StartsWith("LoteDom"))
+            {
+                if (horaNormalizada.Contains("12:00 PM") || horaNormalizada.Contains("12 PM"))
+                    return "Lotedom 12:00 PM";
+            }
 
             // Nacional
             // if (nombre.StartsWith("Nacional"))
@@ -411,8 +403,6 @@ namespace LoteriaWebScraper
             }
 
            
-
-
 
             // Gana Más → Nac.Tarde
             if (nombre.StartsWith("Gana Más"))
