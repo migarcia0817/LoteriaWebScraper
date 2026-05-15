@@ -105,19 +105,16 @@ namespace LoteriaWebScraper
 
         public async Task GuardarResultadosEnFirebase(List<(string Loteria, string Fecha, string Hora, string Numero)> resultados)
         {
-            
-
             int guardados = 0;
             int omitidosClaveNula = 0;
             int omitidosSinDiccionario = 0;
+            int omitidosYaPublicados = 0;
 
             foreach (var grupo in resultados.GroupBy(r => r.Loteria))
             {
                 var loteriaNombre = grupo.Key;
                 var fechaNormalizada = FechaHelper.GetFechaLocal(); // ✅ usar helper
                 var hora = grupo.First().Hora;
-
-               
 
                 var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
 
@@ -132,6 +129,20 @@ namespace LoteriaWebScraper
                 {
                     omitidosSinDiccionario++;
                     _logger.LogWarning($"⚠️ No se encontró clave en el diccionario para {nombreNormalizado}, se omite.");
+                    continue;
+                }
+
+                // 🔹 Verificar si ya existe resultado para esa lotería en esa fecha
+                var existente = await _firebaseClient
+                    .Child("Resultados")
+                    .Child(loteriaClave)
+                    .Child(fechaNormalizada)
+                    .OnceSingleAsync<object>();
+
+                if (existente != null)
+                {
+                    omitidosYaPublicados++;
+                    _logger.LogInformation($"⏩ Ya existe resultado para {nombreNormalizado} ({fechaNormalizada}), se omite.");
                     continue;
                 }
 
@@ -159,8 +170,9 @@ namespace LoteriaWebScraper
                 guardados++;
             }
 
-            _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, OmitidosClaveNula={omitidosClaveNula}, OmitidosSinDiccionario={omitidosSinDiccionario}");
+            _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, OmitidosClaveNula={omitidosClaveNula}, OmitidosSinDiccionario={omitidosSinDiccionario}, OmitidosYaPublicados={omitidosYaPublicados}");
         }
+
 
         //limpiar fecha de mas 
 
