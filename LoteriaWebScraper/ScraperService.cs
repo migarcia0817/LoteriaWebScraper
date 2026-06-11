@@ -78,69 +78,67 @@ namespace LoteriaWebScraper
     };
         }
 
-        // Aquí van tus métodos ObtenerNumerosGanadoresAsync, GuardarResultadosEnFirebase y NormalizarNombre
-
-
+        // 🔹 Método con reintentos si no hay números
         public async Task<List<(string Loteria, string Fecha, string Hora, string Numero)>> ObtenerNumerosGanadoresAsync()
         {
             var url = "https://enloteria.com";
             using var client = new HttpClient();
-            var html = await client.GetStringAsync(url);
 
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
+            int intentos = 0;
+            List<(string Loteria, string Fecha, string Hora, string Numero)> resultados = new();
 
-            var resultados = new List<(string Loteria, string Fecha, string Hora, string Numero)>();
-
-            var loteriaBloques = doc.DocumentNode.SelectNodes("//div[contains(@class,'card-body')]");
-            if (loteriaBloques != null)
+            while (intentos < 3 && resultados.Count == 0)
             {
-                foreach (var bloque in loteriaBloques)
-                {
-                    var nombre = bloque.SelectSingleNode(".//h5[contains(@class,'lottery-name')]")?.InnerText.Trim() ?? "Desconocida";
-                    var fecha = bloque.SelectSingleNode(".//span[contains(@class,'result-date')]")?.InnerText.Trim() ?? "";
-                    var hora = bloque.SelectSingleNode(".//span[contains(@class,'lottery-closing-time')]")?.InnerText.Trim() ?? "";
+                var html = await client.GetStringAsync(url);
+                var doc = new HtmlDocument();
+                doc.LoadHtml(html);
 
-                    var numeros = bloque.SelectNodes(".//div[contains(@class,'result-number')]");
-                    if (numeros != null)
+                var loteriaBloques = doc.DocumentNode.SelectNodes("//div[contains(@class,'card-body')]");
+                if (loteriaBloques != null)
+                {
+                    foreach (var bloque in loteriaBloques)
                     {
-                        foreach (var num in numeros)
+                        var nombre = bloque.SelectSingleNode(".//h5[contains(@class,'lottery-name')]")?.InnerText.Trim() ?? "Desconocida";
+                        var fecha = bloque.SelectSingleNode(".//span[contains(@class,'result-date')]")?.InnerText.Trim() ?? "";
+                        var hora = bloque.SelectSingleNode(".//span[contains(@class,'lottery-closing-time')]")?.InnerText.Trim() ?? "";
+
+                        var numeros = bloque.SelectNodes(".//div[contains(@class,'result-number')]");
+                        if (numeros != null)
                         {
-                            resultados.Add((nombre, fecha, hora, num.InnerText.Trim()));
+                            foreach (var num in numeros)
+                            {
+                                resultados.Add((nombre, fecha, hora, num.InnerText.Trim()));
+                            }
                         }
                     }
+                }
+
+                if (resultados.Count == 0)
+                {
+                    intentos++;
+                    _logger.LogWarning($"⚠️ Intento {intentos}: aún no hay resultados, reintentando en 2 minutos...");
+                    await Task.Delay(TimeSpan.FromMinutes(2));
                 }
             }
 
             return resultados;
         }
 
+        // 🔹 Guardar resultados con validación de premios vacíos
         public async Task GuardarResultadosEnFirebase(List<(string Loteria, string Fecha, string Hora, string Numero)> resultados)
         {
-            int guardados = 0;
-            int omitidosClaveNula = 0;
-            int omitidosSinDiccionario = 0;
-            int omitidosYaPublicados = 0;
+            int guardados = 0, omitidos = 0;
 
             foreach (var grupo in resultados.GroupBy(r => r.Loteria))
             {
                 var loteriaNombre = grupo.Key;
-                var fechaNormalizada = FechaHelper.GetFechaLocal(); // ✅ usar helper
+                var fechaNormalizada = FechaHelper.GetFechaLocal();
                 var hora = grupo.First().Hora;
-
                 var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
 
-                if (string.IsNullOrWhiteSpace(nombreNormalizado))
+                if (string.IsNullOrWhiteSpace(nombreNormalizado) || !LoteriaClaves.TryGetValue(nombreNormalizado, out var loteriaClave))
                 {
-                    omitidosClaveNula++;
-                    _logger.LogWarning($"⚠️ Nombre normalizado nulo para {loteriaNombre} ({hora}), se omite.");
-                    continue;
-                }
-
-                if (!LoteriaClaves.TryGetValue(nombreNormalizado, out var loteriaClave))
-                {
-                    omitidosSinDiccionario++;
-                    _logger.LogWarning($"⚠️ No se encontró clave en el diccionario para {nombreNormalizado}, se omite.");
+                    omitidos++;
                     continue;
                 }
 
@@ -148,6 +146,13 @@ namespace LoteriaWebScraper
                 var primerPremio = numeros.ElementAtOrDefault(0) ?? "";
                 var segundoPremio = numeros.ElementAtOrDefault(1) ?? "";
                 var tercerPremio = numeros.ElementAtOrDefault(2) ?? "";
+
+                // 🔹 Validar que no estén vacíos
+                if (string.IsNullOrEmpty(primerPremio) || string.IsNullOrEmpty(segundoPremio))
+                {
+                    _logger.LogWarning($"⏩ {nombreNormalizado} detectado pero sin premios completos, se omite.");
+                    continue;
+                }
 
                 var resultado = new
                 {
@@ -159,32 +164,8 @@ namespace LoteriaWebScraper
                     TercerPremio = tercerPremio
                 };
 
-                // 🔹 Lista de clientes Firebase con su URL asociada
-                var firebaseClients = new List<(FirebaseClient Client, string Url)>
-        {
-            (
-                new FirebaseClient(
-                    "https://bancachupon-default-rtdb.firebaseio.com/",
-                    new FirebaseOptions
-                    {
-                        AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
-                    }),
-                "https://bancachupon-default-rtdb.firebaseio.com/"
-            ),
-            (
-                new FirebaseClient(
-                    "https://bancapiloto01-default-rtdb.firebaseio.com/",
-                    new FirebaseOptions
-                    {
-                        AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
-                    }),
-                "https://bancapiloto01-default-rtdb.firebaseio.com/"
-            )
-        };
-
-                foreach (var (client, url) in firebaseClients)
+                foreach (var client in _firebaseClients)
                 {
-                    // 🔹 Verificar si ya existe resultado en esa base
                     var existente = await client
                         .Child("Resultados")
                         .Child(loteriaClave)
@@ -193,8 +174,7 @@ namespace LoteriaWebScraper
 
                     if (existente != null)
                     {
-                        omitidosYaPublicados++;
-                        _logger.LogInformation($"⏩ Ya existe resultado en {url} para {nombreNormalizado} ({fechaNormalizada}), se omite.");
+                        _logger.LogInformation($"⏩ Ya existe resultado en {loteriaClave} ({fechaNormalizada}), se omite.");
                         continue;
                     }
 
@@ -204,51 +184,25 @@ namespace LoteriaWebScraper
                         .Child(fechaNormalizada)
                         .PutAsync(resultado);
 
-                    _logger.LogInformation($"✅ Guardado en {url}: {nombreNormalizado} ({fechaNormalizada}) - {primerPremio}, {segundoPremio}, {tercerPremio}");
+                    _logger.LogInformation($"✅ Guardado {nombreNormalizado} ({fechaNormalizada}) - {primerPremio}, {segundoPremio}, {tercerPremio}");
                     guardados++;
                 }
             }
 
-            _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, OmitidosClaveNula={omitidosClaveNula}, OmitidosSinDiccionario={omitidosSinDiccionario}, OmitidosYaPublicados={omitidosYaPublicados}");
+            _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, Omitidos={omitidos}");
         }
 
-
-        //limpiar fecha de mas 
-
+        // 🔹 Limpiar fechas futuras pero conservar día anterior
         public async Task LimpiarFechasFuturas()
         {
-            var fechaHoy = FechaHelper.GetFechaLocal(); // ej: "2026-04-16"
+            var fechaHoy = FechaHelper.GetFechaLocal();
+            var fechaAyer = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
 
-            // 🔹 Lista de clientes Firebase con su URL asociada
-            var firebaseClients = new List<(FirebaseClient Client, string Url)>
-    {
-        (
-            new FirebaseClient(
-                "https://bancachupon-default-rtdb.firebaseio.com/",
-                new FirebaseOptions
-                {
-                    AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
-                }),
-            "https://bancachupon-default-rtdb.firebaseio.com/"
-        ),
-        (
-            new FirebaseClient(
-                "https://bancapiloto01-default-rtdb.firebaseio.com/",
-                new FirebaseOptions
-                {
-                    AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
-                }),
-            "https://bancapiloto01-default-rtdb.firebaseio.com/"
-        )
-    };
-
-            foreach (var (client, url) in firebaseClients)
+            foreach (var client in _firebaseClients)
             {
                 foreach (var kvp in LoteriaClaves)
                 {
                     var loteriaClave = kvp.Value;
-
-                    // Traer todas las fechas guardadas para esa lotería
                     var fechasGuardadas = await client
                         .Child("Resultados")
                         .Child(loteriaClave)
@@ -258,7 +212,7 @@ namespace LoteriaWebScraper
                     {
                         var fecha = registro.Key;
 
-                        // Si la fecha es distinta a la actual y es mayor → borrar
+                        // 🔹 Eliminar solo si es mayor a hoy
                         if (string.Compare(fecha, fechaHoy) > 0)
                         {
                             await client
@@ -267,15 +221,14 @@ namespace LoteriaWebScraper
                                 .Child(fecha)
                                 .DeleteAsync();
 
-                            _logger.LogInformation($"🗑️ Eliminada {loteriaClave} en fecha {fecha} en {url}");
+                            _logger.LogInformation($"🗑️ Eliminada {loteriaClave} en fecha {fecha}");
                         }
                     }
                 }
-
-                _logger.LogInformation($"✅ Limpieza completada en {url}. Se conservaron solo los resultados del {fechaHoy}");
             }
-        }
 
+            _logger.LogInformation($"✅ Limpieza completada. Se conservaron resultados de {fechaHoy} y {fechaAyer}");
+        }
 
 
 
