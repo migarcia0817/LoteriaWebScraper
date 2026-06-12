@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Firebase.Database;
 using Firebase.Database.Query;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Globalization;
 
 namespace LoteriaWebScraper.Controllers
 {
@@ -25,53 +22,33 @@ namespace LoteriaWebScraper.Controllers
                 });
         }
 
-        // ✅ Endpoint para mostrar resultados de NY Noche (sin filtrar fecha)
-        [HttpGet("ny-noche")]
-        public async Task<IActionResult> ObtenerNyNoche()
+        // ✅ Endpoint manual para publicar NY Noche de una fecha específica
+        [HttpPost("publicar-ny-noche-manual")]
+        public async Task<IActionResult> PublicarNyNocheManual([FromQuery] string fecha,
+                                                               [FromQuery] string primerPremio,
+                                                               [FromQuery] string segundoPremio,
+                                                               [FromQuery] string tercerPremio)
         {
-            var scraper = new ScraperService(null);
-            var resultados = await scraper.ObtenerNumerosGanadoresAsync();
+            if (string.IsNullOrWhiteSpace(fecha))
+                return BadRequest("Debe especificar la fecha en formato yyyy-MM-dd");
 
-            var nyNoche = resultados
-                .Where(r => r.Loteria.ToUpperInvariant().Contains("NEW YORK"))
-                .Where(r =>
-                {
-                    // ✅ Normalización de hora
-                    var horaNormalizada = NormalizarNombre(r.Loteria, r.Hora);
-                    return horaNormalizada == "NY.Noche 11:30 PM";
-                })
-                .ToList();
-
-            if (!nyNoche.Any())
-                return NotFound("No se encontraron resultados de N.Y Noche");
-
-            var numeros = nyNoche.Select(r => r.Numero).Take(3).ToList();
-
-            return Ok(new
+            var resultado = new
             {
+                FechaSorteo = fecha,
                 LoteriaClave = "NYNoche_1130_PM",
                 LoteriaNombre = "N.Y Noche 11:30 PM",
-                PrimerPremio = numeros.ElementAtOrDefault(0) ?? "",
-                SegundoPremio = numeros.ElementAtOrDefault(1) ?? "",
-                TercerPremio = numeros.ElementAtOrDefault(2) ?? ""
-            });
-        }
+                PrimerPremio = primerPremio ?? "",
+                SegundoPremio = segundoPremio ?? "",
+                TercerPremio = tercerPremio ?? ""
+            };
 
-        // 👉 Método de normalización robusto
-        private string NormalizarNombre(string nombre, string horaNormalizada)
-        {
-            if (nombre.ToUpperInvariant().StartsWith("NEW YORK"))
-            {
-                var hora = horaNormalizada.Replace(" ", "").ToUpperInvariant();
+            await _firebase
+                .Child("Resultados")
+                .Child("NYNoche_1130_PM")
+                .Child(fecha)
+                .PutAsync(resultado);
 
-                if (hora.Contains("2:30PM"))
-                    return "NY.Tarde 3:30 PM";
-
-                if (hora.Contains("10:30PM") || hora.Contains("11:30PM"))
-                    return "NY.Noche 11:30 PM";
-            }
-
-            return nombre; // fallback si no coincide
+            return Ok($"✅ Resultado de N.Y Noche publicado para {fecha}");
         }
     }
 }
