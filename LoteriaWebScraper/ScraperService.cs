@@ -76,6 +76,10 @@ namespace LoteriaWebScraper
                 AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET_PILOTO"))
             })
     };
+
+            // 🔹 Verificación de variables de entorno si esta jalandola
+            _logger.LogInformation($"Secret chupon: {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("FIREBASE_SECRET")) ? "NO CONFIGURADO" : "OK")}");
+            _logger.LogInformation($"Secret piloto: {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("FIREBASE_SECRET_PILOTO")) ? "NO CONFIGURADO" : "OK")}");
         }
 
         // 🔹 Método con reintentos si no hay números
