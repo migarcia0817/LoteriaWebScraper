@@ -73,7 +73,7 @@ namespace LoteriaWebScraper
             "https://bancapiloto01-default-rtdb.firebaseio.com/",
             new FirebaseOptions
             {
-                AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
+                AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET_PILOTO"))
             })
     };
         }
