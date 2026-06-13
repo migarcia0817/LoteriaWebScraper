@@ -19,7 +19,9 @@ RUN dotnet publish -c Release -o /app/publish
 # Usa imagen runtime para ejecutar
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-COPY --from=build /app/publish .
+COPY --from=build /app/publish .      
+
+# Forzar redeploy 2026-06-12
 
 # Arranca el servicio
 ENTRYPOINT ["dotnet", "LoteriaWebScraper.dll"]
