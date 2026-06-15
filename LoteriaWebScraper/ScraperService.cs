@@ -59,7 +59,8 @@ namespace LoteriaWebScraper
             _logger = logger;
 
             _firebaseClient = new FirebaseClient(
-                "https://bancachupon-default-rtdb.firebaseio.com/",
+                //"https://bancachupon-default-rtdb.firebaseio.com/",
+                "https://bancapiloto01-default-rtdb.firebaseio.com/",
                 new FirebaseOptions
                 {
                       AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
