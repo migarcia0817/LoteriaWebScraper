@@ -62,8 +62,10 @@ namespace LoteriaWebScraper
                 "https://bancachupon-default-rtdb.firebaseio.com/",
                 new FirebaseOptions
                 {
-                    AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
+                      AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_SECRET"))
                 });
+
+            //mun mensahito aquii
         }
 
         // Aquí van tus métodos ObtenerNumerosGanadoresAsync, GuardarResultadosEnFirebase y NormalizarNombre
