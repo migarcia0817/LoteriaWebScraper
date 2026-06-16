@@ -7,12 +7,12 @@
       "RelativeMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|solutionrelative:loteriawebscraper\\scraperservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|c:\\users\\pc\\source\\repos\\loteriawebscraper\\loteriawebscraper\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|solutionrelative:loteriawebscraper\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|c:\\users\\pc\\source\\repos\\loteriawebscraper\\loteriawebscraper\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|solutionrelative:loteriawebscraper\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|c:\\users\\pc\\source\\repos\\loteriawebscraper\\loteriawebscraper\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|solutionrelative:loteriawebscraper\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|c:\\users\\pc\\source\\repos\\loteriawebscraper\\loteriawebscraper\\controllers\\resultadoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -41,13 +41,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Dockerfile",
               "DocumentMoniker": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\Dockerfile",
               "RelativeDocumentMoniker": "LoteriaWebScraper\\Dockerfile",
               "ToolTip": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\Dockerfile",
               "RelativeToolTip": "LoteriaWebScraper\\Dockerfile",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2026-06-15T23:14:42.795Z",
               "EditorCaption": ""
@@ -78,13 +78,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\Program.cs",
               "RelativeDocumentMoniker": "LoteriaWebScraper\\Program.cs",
               "ToolTip": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\Program.cs",
               "RelativeToolTip": "LoteriaWebScraper\\Program.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAAAEwCoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABgAAAAAAAAAAAAswCsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-10T20:21:44.307Z",
               "EditorCaption": ""
@@ -95,9 +95,9 @@
               "Title": "ScraperService.cs",
               "DocumentMoniker": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\ScraperService.cs",
               "RelativeDocumentMoniker": "LoteriaWebScraper\\ScraperService.cs",
-              "ToolTip": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\ScraperService.cs",
-              "RelativeToolTip": "LoteriaWebScraper\\ScraperService.cs",
-              "ViewState": "AgIAADUAAAAAAAAAAAAQwD0AAABFAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\ScraperService.cs*",
+              "RelativeToolTip": "LoteriaWebScraper\\ScraperService.cs*",
+              "ViewState": "AgIAAL4AAAAAAAAAAAAswM4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-10T19:01:11.217Z",
               "EditorCaption": ""
