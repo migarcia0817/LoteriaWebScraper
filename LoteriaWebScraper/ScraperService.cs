@@ -104,20 +104,21 @@ namespace LoteriaWebScraper
 
             return resultados;
         }
-
         public async Task GuardarResultadosEnFirebase(List<(string Loteria, string Fecha, string Hora, string Numero)> resultados)
         {
             int guardados = 0;
             int omitidosClaveNula = 0;
             int omitidosSinDiccionario = 0;
             int omitidosYaPublicados = 0;
+            int omitidosFechaInvalida = 0;
+
+            var fechaHoy = FechaHelper.GetFechaLocal(); // ej: "2026-06-15"
+            var fechaAyer = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
 
             foreach (var grupo in resultados.GroupBy(r => r.Loteria))
             {
                 var loteriaNombre = grupo.Key;
-                var fechaNormalizada = FechaHelper.GetFechaLocal(); // ✅ usar helper
                 var hora = grupo.First().Hora;
-
                 var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
 
                 if (string.IsNullOrWhiteSpace(nombreNormalizado))
@@ -134,17 +135,26 @@ namespace LoteriaWebScraper
                     continue;
                 }
 
+                // 🔹 Validar que la fecha del resultado sea hoy o ayer
+                var fechaResultado = grupo.First().Fecha;
+                if (fechaResultado != fechaHoy && fechaResultado != fechaAyer)
+                {
+                    omitidosFechaInvalida++;
+                    _logger.LogWarning($"⏩ Resultado {nombreNormalizado} descartado: fecha {fechaResultado} fuera de rango ({fechaHoy}/{fechaAyer}).");
+                    continue;
+                }
+
                 // 🔹 Verificar si ya existe resultado para esa lotería en esa fecha
                 var existente = await _firebaseClient
                     .Child("Resultados")
                     .Child(loteriaClave)
-                    .Child(fechaNormalizada)
+                    .Child(fechaResultado)
                     .OnceSingleAsync<object>();
 
                 if (existente != null)
                 {
                     omitidosYaPublicados++;
-                    _logger.LogInformation($"⏩ Ya existe resultado para {nombreNormalizado} ({fechaNormalizada}), se omite.");
+                    _logger.LogInformation($"⏩ Ya existe resultado para {nombreNormalizado} ({fechaResultado}), se omite.");
                     continue;
                 }
 
@@ -153,15 +163,15 @@ namespace LoteriaWebScraper
                 var segundoPremio = numeros.ElementAtOrDefault(1) ?? "";
                 var tercerPremio = numeros.ElementAtOrDefault(2) ?? "";
 
-                _logger.LogInformation($"✅ Guardando: {nombreNormalizado} ({fechaNormalizada}) - {primerPremio}, {segundoPremio}, {tercerPremio}");
+                _logger.LogInformation($"✅ Guardando: {nombreNormalizado} ({fechaResultado}) - {primerPremio}, {segundoPremio}, {tercerPremio}");
 
                 await _firebaseClient
                     .Child("Resultados")
                     .Child(loteriaClave)
-                    .Child(fechaNormalizada)
+                    .Child(fechaResultado)
                     .PutAsync(new
                     {
-                        FechaSorteo = fechaNormalizada,
+                        FechaSorteo = fechaResultado,
                         LoteriaClave = loteriaClave,
                         LoteriaNombre = nombreNormalizado,
                         PrimerPremio = primerPremio,
@@ -172,21 +182,19 @@ namespace LoteriaWebScraper
                 guardados++;
             }
 
-            _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, OmitidosClaveNula={omitidosClaveNula}, OmitidosSinDiccionario={omitidosSinDiccionario}, OmitidosYaPublicados={omitidosYaPublicados}");
+            _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, OmitidosClaveNula={omitidosClaveNula}, OmitidosSinDiccionario={omitidosSinDiccionario}, OmitidosYaPublicados={omitidosYaPublicados}, OmitidosFechaInvalida={omitidosFechaInvalida}");
         }
 
 
-        //limpiar fecha de mas 
-
+        // 🔹 Limpiar fechas futuras pero conservar hoy y ayer
         public async Task LimpiarFechasFuturas()
         {
-            var fechaHoy = FechaHelper.GetFechaLocal(); // ej: "2026-04-16"
+            var fechaHoy = FechaHelper.GetFechaLocal();
+            var fechaAyer = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
 
             foreach (var kvp in LoteriaClaves)
             {
                 var loteriaClave = kvp.Value;
-
-                // Traer todas las fechas guardadas para esa lotería
                 var fechasGuardadas = await _firebaseClient
                     .Child("Resultados")
                     .Child(loteriaClave)
@@ -196,7 +204,7 @@ namespace LoteriaWebScraper
                 {
                     var fecha = registro.Key;
 
-                    // Si la fecha es distinta a la actual y es mayor → borrar
+                    // 🔹 Eliminar solo si es mayor a hoy
                     if (string.Compare(fecha, fechaHoy) > 0)
                     {
                         await _firebaseClient
@@ -210,8 +218,9 @@ namespace LoteriaWebScraper
                 }
             }
 
-            _logger.LogInformation($"✅ Limpieza completada. Se conservaron solo los resultados del {fechaHoy}");
+            _logger.LogInformation($"✅ Limpieza completada. Se conservaron resultados de {fechaHoy} y {fechaAyer}");
         }
+
 
 
 
