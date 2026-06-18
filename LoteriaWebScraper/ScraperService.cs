@@ -104,32 +104,23 @@ namespace LoteriaWebScraper
 
             return resultados;
         }
-        private string ParseFechaWeb(string fechaWeb)
-        {
-            // Ejemplo: "Jue 18 de junio, 2026"
-            var cultura = new CultureInfo("es-ES");
-            if (DateTime.TryParse(fechaWeb, cultura, DateTimeStyles.None, out var fecha))
-            {
-                return fecha.ToString("yyyy-MM-dd");
-            }
-
-            // fallback: fecha local si no se pudo parsear
-            return FechaHelper.GetFechaLocal();
-        }
-
         public async Task GuardarResultadosEnFirebase(List<(string Loteria, string Fecha, string Hora, string Numero)> resultados)
         {
             int guardados = 0, omitidos = 0;
 
             foreach (var grupo in resultados.GroupBy(r => r.Loteria))
             {
-               
+                var zonaRD = TimeZoneInfo.FindSystemTimeZoneById("America/Santo_Domingo");
+                var horaRD = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaRD);
+
+                _logger.LogInformation($"UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}");
+                _logger.LogInformation($"RD : {horaRD:yyyy-MM-dd HH:mm:ss}");
+                _logger.LogInformation($"FechaHelper: {FechaHelper.GetFechaLocal()}");
 
                 var loteriaNombre = grupo.Key;
+                var fechaHoy = FechaHelper.GetFechaLocal(); // ej: "2026-06-16"
+                var fechaAyer =  DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
                 var hora = grupo.First().Hora;
-                var fechaWeb = grupo.First().Fecha;
-                var fechaPublicacion = ParseFechaWeb(fechaWeb);
-
                 var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
 
                 if (string.IsNullOrWhiteSpace(nombreNormalizado) || !LoteriaClaves.TryGetValue(nombreNormalizado, out var loteriaClave))
@@ -143,20 +134,41 @@ namespace LoteriaWebScraper
                 var segundoPremio = numeros.ElementAtOrDefault(1) ?? "";
                 var tercerPremio = numeros.ElementAtOrDefault(2) ?? "";
 
-                //// 🔹 Validar premios incompletos
-                //if (string.IsNullOrEmpty(primerPremio) || string.IsNullOrEmpty(segundoPremio))
-                //{
-                //    _logger.LogWarning($"⏩ {nombreNormalizado} detectado pero sin premios completos, se omite publicación.");
-                //    continue;
-                //}
+                // 🔹 Validar premios
+                if (string.IsNullOrEmpty(primerPremio) || string.IsNullOrEmpty(segundoPremio))
+                {
+                    _logger.LogWarning($"⏩ {nombreNormalizado} detectado pero sin premios completos, se intentará publicar el día anterior.");
 
-                //_logger.LogInformation(
-                //   $"LOTERIA={loteriaNombre} | HORA={hora} | FECHA_WEB={fechaWeb} | FECHA_GUARDADA={fechaPublicacion}"
-                //);
+                    // 🔹 Buscar resultados del día anterior
+                    var existenteAyer = await _firebaseClient
+                        .Child("Resultados")
+                        .Child(loteriaClave)
+                        .Child(fechaAyer)
+                        .OnceSingleAsync<object>();
 
+                    if (existenteAyer == null)
+                    {
+                        var resultadoAyer = new
+                        {
+                            FechaSorteo = fechaAyer,
+                            LoteriaClave = loteriaClave,
+                            LoteriaNombre = nombreNormalizado,
+                            PrimerPremio = primerPremio,
+                            SegundoPremio = segundoPremio,
+                            TercerPremio = tercerPremio
+                        };
+
+                       
+                    }
+
+                    continue; // 🔹 saltar publicación normal
+                }
+                _logger.LogInformation(
+           $"LOTERIA={loteriaNombre} | HORA={hora} | FECHA_WEB={grupo.First().Fecha} | FECHA_GUARDADA={fechaHoy}"
+       );
                 var resultado = new
                 {
-                    FechaSorteo = fechaPublicacion,
+                    FechaSorteo = fechaHoy,
                     LoteriaClave = loteriaClave,
                     LoteriaNombre = nombreNormalizado,
                     PrimerPremio = primerPremio,
@@ -167,28 +179,27 @@ namespace LoteriaWebScraper
                 var existente = await _firebaseClient
                     .Child("Resultados")
                     .Child(loteriaClave)
-                    .Child(fechaPublicacion)
+                    .Child(fechaHoy)
                     .OnceSingleAsync<object>();
 
                 if (existente != null)
                 {
-                    _logger.LogInformation($"⏩ Ya existe resultado en {loteriaClave} ({fechaPublicacion}), se omite.");
+                    _logger.LogInformation($"⏩ Ya existe resultado en {loteriaClave} ({fechaHoy}), se omite.");
                     continue;
                 }
 
                 await _firebaseClient
                     .Child("Resultados")
                     .Child(loteriaClave)
-                    .Child(fechaPublicacion)
+                    .Child(fechaHoy)
                     .PutAsync(resultado);
 
-                _logger.LogInformation($"✅ Guardado {nombreNormalizado} ({fechaPublicacion}) - {primerPremio}, {segundoPremio}, {tercerPremio}");
+                _logger.LogInformation($"✅ Guardado {nombreNormalizado} ({fechaHoy}) - {primerPremio}, {segundoPremio}, {tercerPremio}");
                 guardados++;
             }
 
-        //    _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, Omitidos={omitidos}");
+            _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, Omitidos={omitidos}");
         }
-
 
 
 
