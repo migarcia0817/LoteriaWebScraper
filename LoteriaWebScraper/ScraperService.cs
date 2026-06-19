@@ -119,7 +119,7 @@ namespace LoteriaWebScraper
 
                 var loteriaNombre = grupo.Key;
                 var fechaHoy = FechaHelper.GetFechaLocal(); // ej: "2026-06-16"
-                var fechaAyer =  DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
+              //  var fechaAyer =  DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
                 var hora = grupo.First().Hora;
                 var nombreNormalizado = NormalizarNombre(loteriaNombre, hora);
 
@@ -137,31 +137,8 @@ namespace LoteriaWebScraper
                 // 🔹 Validar premios
                 if (string.IsNullOrEmpty(primerPremio) || string.IsNullOrEmpty(segundoPremio))
                 {
-                    _logger.LogWarning($"⏩ {nombreNormalizado} detectado pero sin premios completos, se intentará publicar el día anterior.");
-
-                    // 🔹 Buscar resultados del día anterior
-                    var existenteAyer = await _firebaseClient
-                        .Child("Resultados")
-                        .Child(loteriaClave)
-                        .Child(fechaAyer)
-                        .OnceSingleAsync<object>();
-
-                    if (existenteAyer == null)
-                    {
-                        var resultadoAyer = new
-                        {
-                            FechaSorteo = fechaAyer,
-                            LoteriaClave = loteriaClave,
-                            LoteriaNombre = nombreNormalizado,
-                            PrimerPremio = primerPremio,
-                            SegundoPremio = segundoPremio,
-                            TercerPremio = tercerPremio
-                        };
-
-                       
-                    }
-
-                    continue; // 🔹 saltar publicación normal
+                    _logger.LogWarning($"⏩ {nombreNormalizado} detectado pero sin premios completos, se omite publicación.");
+                    continue;
                 }
                 _logger.LogInformation(
            $"LOTERIA={loteriaNombre} | HORA={hora} | FECHA_WEB={grupo.First().Fecha} | FECHA_GUARDADA={fechaHoy}"

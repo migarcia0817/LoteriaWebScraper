@@ -7,16 +7,8 @@
       "RelativeMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|solutionrelative:loteriawebscraper\\scraperservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|c:\\users\\pc\\source\\repos\\loteriawebscraper\\loteriawebscraper\\fechahelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|solutionrelative:loteriawebscraper\\fechahelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|c:\\users\\pc\\source\\repos\\loteriawebscraper\\loteriawebscraper\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|solutionrelative:loteriawebscraper\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|c:\\users\\pc\\source\\repos\\loteriawebscraper\\loteriawebscraper\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|solutionrelative:loteriawebscraper\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F9458EE2-0D50-43EC-9D46-EA067644E5B7}|LoteriaWebScraper\\LoteriaWebScraper.csproj|c:\\users\\pc\\source\\repos\\loteriawebscraper\\loteriawebscraper\\controllers\\resultadoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -33,7 +25,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -46,19 +38,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "FechaHelper.cs",
-              "DocumentMoniker": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\FechaHelper.cs",
-              "RelativeDocumentMoniker": "LoteriaWebScraper\\FechaHelper.cs",
-              "ToolTip": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\FechaHelper.cs",
-              "RelativeToolTip": "LoteriaWebScraper\\FechaHelper.cs",
-              "ViewState": "AgIAAAcAAAAAAAAAAADwvxYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-18T17:50:33.622Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
               "Title": "Dockerfile",
               "DocumentMoniker": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\Dockerfile",
               "RelativeDocumentMoniker": "LoteriaWebScraper\\Dockerfile",
@@ -71,7 +50,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "ResultadosController.cs",
               "DocumentMoniker": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\Controllers\\ResultadosController.cs",
               "RelativeDocumentMoniker": "LoteriaWebScraper\\Controllers\\ResultadosController.cs",
@@ -83,7 +62,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
               "Title": "bancachupon-firebase-adminsdk-fbsvc-01544e198e.json",
               "DocumentMoniker": "C:\\Users\\pc\\Downloads\\bancachupon-firebase-adminsdk-fbsvc-01544e198e.json",
               "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\bancachupon-firebase-adminsdk-fbsvc-01544e198e.json",
@@ -95,26 +74,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\Program.cs",
-              "RelativeDocumentMoniker": "LoteriaWebScraper\\Program.cs",
-              "ToolTip": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\Program.cs",
-              "RelativeToolTip": "LoteriaWebScraper\\Program.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAswCsAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T20:21:44.307Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "ScraperService.cs",
               "DocumentMoniker": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\ScraperService.cs",
               "RelativeDocumentMoniker": "LoteriaWebScraper\\ScraperService.cs",
               "ToolTip": "C:\\Users\\pc\\source\\repos\\LoteriaWebScraper\\LoteriaWebScraper\\ScraperService.cs*",
               "RelativeToolTip": "LoteriaWebScraper\\ScraperService.cs*",
-              "ViewState": "AgIAAHEAAAAAAAAAAAAswH8AAAAfAAAAAAAAAA==",
+              "ViewState": "AgIAAHoAAAAAAAAAAAAAAI0AAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-10T19:01:11.217Z",
               "EditorCaption": ""
