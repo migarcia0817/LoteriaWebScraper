@@ -142,7 +142,7 @@ namespace LoteriaWebScraper
                 // 🔹 No publicar si la fecha de la página no coincide con la fecha local RD
                 if (fechaPublicacion != fechaHoyRD)
                 {
-                    _logger.LogWarning($"⏩ {loteriaNombre} ({hora}) tiene fecha {fechaPublicacion}, se omite porque no es hoy ({fechaHoyRD}).");
+                    _logger.LogWarning($"⏩ {loteriaNombre} ({hora}) tiene fecha {fechaPublicacion}, se omite porque no coincide con la fecha local RD ({fechaHoyRD}).");
                     omitidos++;
                     continue;
                 }
@@ -206,6 +206,7 @@ namespace LoteriaWebScraper
 
             _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, Omitidos={omitidos}");
         }
+
 
 
 
