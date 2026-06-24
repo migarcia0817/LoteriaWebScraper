@@ -106,7 +106,7 @@ namespace LoteriaWebScraper
         }
         private string ParseFechaWeb(string fechaWeb)
         {
-            // Ejemplo: "Jue 18 de junio, 2026"
+            // Ejemplo: "Mar 23 de junio, 2026"
             var cultura = new CultureInfo("es-ES");
             if (DateTime.TryParse(fechaWeb, cultura, DateTimeStyles.None, out var fecha))
             {
@@ -114,32 +114,35 @@ namespace LoteriaWebScraper
             }
 
             // fallback: fecha local si no se pudo parsear
-            return FechaHelper.GetFechaLocal();
+            var zonaRD = TimeZoneInfo.FindSystemTimeZoneById("America/Santo_Domingo");
+            var horaRD = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaRD);
+            return horaRD.ToString("yyyy-MM-dd");
         }
 
         public async Task GuardarResultadosEnFirebase(List<(string Loteria, string Fecha, string Hora, string Numero)> resultados)
         {
             int guardados = 0, omitidos = 0;
-            var fechaHoy = FechaHelper.GetFechaLocal(); // ej: "2026-06-23"
+
+            // 🔹 Fecha local en RD
+            var zonaRD = TimeZoneInfo.FindSystemTimeZoneById("America/Santo_Domingo");
+            var horaRD = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaRD);
+            var fechaHoyRD = horaRD.ToString("yyyy-MM-dd");
 
             foreach (var grupo in resultados.GroupBy(r => r.Loteria))
             {
-                var zonaRD = TimeZoneInfo.FindSystemTimeZoneById("America/Santo_Domingo");
-                var horaRD = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaRD);
-
                 _logger.LogInformation($"UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}");
                 _logger.LogInformation($"RD : {horaRD:yyyy-MM-dd HH:mm:ss}");
-                _logger.LogInformation($"FechaHelper: {fechaHoy}");
+                _logger.LogInformation($"FechaHelper: {fechaHoyRD}");
 
                 var loteriaNombre = grupo.Key;
                 var hora = grupo.First().Hora;
                 var fechaWeb = grupo.First().Fecha;
                 var fechaPublicacion = ParseFechaWeb(fechaWeb);
 
-                // 🔹 No publicar si la fecha de la página es distinta a hoy
-                if (fechaPublicacion != fechaHoy)
+                // 🔹 No publicar si la fecha de la página no coincide con la fecha local RD
+                if (fechaPublicacion != fechaHoyRD)
                 {
-                    _logger.LogWarning($"⏩ {loteriaNombre} ({hora}) tiene fecha {fechaPublicacion}, se omite porque no es hoy ({fechaHoy}).");
+                    _logger.LogWarning($"⏩ {loteriaNombre} ({hora}) tiene fecha {fechaPublicacion}, se omite porque no es hoy ({fechaHoyRD}).");
                     omitidos++;
                     continue;
                 }
@@ -203,6 +206,7 @@ namespace LoteriaWebScraper
 
             _logger.LogInformation($"📊 Resumen ciclo: Guardados={guardados}, Omitidos={omitidos}");
         }
+
 
 
 
